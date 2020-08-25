@@ -20,8 +20,13 @@ def create_dataset(root_path):
         for j in range(len(data)):
             data_map['ID'].append(data[j]['id_str'])
             data_map['Text'].append(data[j]['full_text'])
-            #print(i)
-            data_map['Label'].append(files[i])
+            if i == 0:
+                data_map['Label'].append(1)
+            elif i == 1:
+                data_map['Label'].append(3)
+            elif i == 2:
+                data_map['Label'].append(2)
+    
     df = pd.DataFrame(data_map, columns=['ID', 'Text', 'Label'])
     df.to_csv(csv_file, index=False)
     print('Done')
