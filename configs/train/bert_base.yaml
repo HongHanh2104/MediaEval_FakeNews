@@ -1,0 +1,57 @@
+id: 1
+pretrained: Null
+seed: 21498
+model:
+    name: bert_base
+    args:
+        nclasses: 3
+        # ... more args
+optimizer:
+    name: Adam
+    args:
+        lr: 0.00001
+        # ... more args
+loss:
+    name: CrossEntropyLoss
+    args:
+        ignore_index: 3
+        # ... more args
+metric:
+    - name: Accuracy
+      args: Null
+          
+    # ... more metrics
+scheduler:
+    name: ReduceLROnPlateau
+    args:
+        mode: min
+        factor: 0.5
+        patience: 5
+        verbose: True
+        # ... more args
+dataset:
+    train:
+        name: twitter_bert
+        args:
+            data_root_dir: /media/honghanh/STORED_DATA/DATA/2020-Fake-News-Detection-Task-master/FakeNews/train_data.csv
+            is_train: True
+        loader:
+            name: twitter_loader
+            args:
+                batch_size: 2
+                shuffle: True
+                # ... more args
+    val:
+        name: twitter_bert
+        args:
+            data_root_dir: /media/honghanh/STORED_DATA/DATA/2020-Fake-News-Detection-Task-master/FakeNews/test_data.csv
+            is_train: False
+        loader:
+            name: twitter_loader
+            args:
+                batch_size: 2
+                # ... more args
+trainer:
+    nepochs: 50
+    val_step: 1
+    log_step: 1
