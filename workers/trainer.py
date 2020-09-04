@@ -52,7 +52,7 @@ class Trainer():
         data = {
             'epoch': epoch,
             'model_state_dict': self.model.state_dict(),
-            'optimizer_state_dict': self.optimizer.state_dict(),
+            'optimier_state_dict': self.optimier.state_dict(),
             'config': self.config
         }
 
@@ -86,20 +86,25 @@ class Trainer():
         self.model.train()
         print('Training........')
         progress_bar = tqdm(dataloader)
-        for i, (inp, lbl) in enumerate(progress_bar):
+        for i, x in enumerate(progress_bar):
             # 1: Load img_inputs and labels
-            inp = move_to(inp, self.device)
-            lbl = move_to(lbl, self.device)
+            input_ids = move_to(x['input_ids'], self.device)
+            attention_mask = move_to(x['attention_mask'], self.device)
+            lbl = move_to(x['labels'], self.device)
+
             # 2: Clear gradients from previous iteration
-            self.optimizer.zero_grad()
+            self.optimier.zero_grad()
             # 3: Get network outputs
-            outs = self.model(inp)
+            outs = self.model(
+                input_ids,
+                attention_mask
+            )
             # 4: Calculate the loss
             loss = self.criterion(outs, lbl)
             # 5: Calculate gradients
             loss.backward()
             # 6: Performing backpropagation
-            self.optimizer.step()
+            self.optimier.step()
             with torch.no_grad():
                 # 7: Update loss
                 running_loss.add(loss.item())
@@ -132,12 +137,16 @@ class Trainer():
         self.model.eval()
         print('Evaluating........')
         progress_bar = tqdm(dataloader)
-        for i, (inp, lbl) in enumerate(progress_bar):
+        for i, x in enumerate(progress_bar):
             # 1: Load inputs and labels
-            inp = move_to(inp, self.device)
-            lbl = move_to(lbl, self.device)
+            input_ids = move_to(x['input_ids'], self.device)
+            attention_mask = move_to(x['attention_mask'], self.device)
+            lbl = move_to(x['labels'], self.device)
             # 2: Get network outputs
-            outs = self.model(inp)
+            outs = self.model(
+                input_ids,
+                attention_mask
+            )
             # 3: Calculate the loss
             loss = self.criterion(outs, lbl)
             # 4: Update loss
@@ -167,7 +176,7 @@ class Trainer():
             print('-----------------------------------')
 
             # Note learning rate
-            for i, group in enumerate(self.optimizer.param_groups):
+            for i, group in enumerate(self.optimier.param_groups):
                 self.tsboard.update_lr(i, group['lr'], epoch)
 
             # 1: Training phase

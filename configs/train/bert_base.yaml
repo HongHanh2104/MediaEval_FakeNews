@@ -1,4 +1,4 @@
-id: 1
+id: bert-baseline
 pretrained: Null
 seed: 21498
 model:
@@ -36,7 +36,7 @@ dataset:
             data_root_dir: /media/honghanh/STORED_DATA/DATA/2020-Fake-News-Detection-Task-master/FakeNews/train_data.csv
             is_train: True
         loader:
-            name: twitter_loader
+            name: DataLoader #twitter_loader
             args:
                 batch_size: 2
                 shuffle: True
@@ -47,7 +47,7 @@ dataset:
             data_root_dir: /media/honghanh/STORED_DATA/DATA/2020-Fake-News-Detection-Task-master/FakeNews/test_data.csv
             is_train: False
         loader:
-            name: twitter_loader
+            name: DataLoader #twitter_loader
             args:
                 batch_size: 2
                 # ... more args

@@ -69,7 +69,7 @@ def main():
     args = parser.parse_args()
 
     twitter = Twitter(args.root)
-    print(twitter.__getitem__(47))
+    #print(twitter.__getitem__(47))
 
 
 
