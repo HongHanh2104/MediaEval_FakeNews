@@ -3,53 +3,56 @@ import pandas as pd
 import numpy as np
 import argparse
 import json
-from sklearn.model_selection import train_test_split
+import random
+import csv
 
-def create_dataset(root_path):
-    csv_file = os.path.join(root_path, 'data.csv')
-    files = ['5g_corona_conspiracy', 'non_conspiracy', 'other_conspiracy']
-    data_map = {
-        'ID': [],
-        'Text': [],
-        'Label': []
-    }
-    for i in range(len(files)):
-        path = os.path.join(root_path, files[i] + '.json')
-        with open(path, 'r') as f:
-            data = json.load(f)
-        for j in range(len(data)):
-            data_map['ID'].append(data[j]['id_str'])
-            data_map['Text'].append(data[j]['full_text'])
-            if i == 0:
-                data_map['Label'].append(1)
-            elif i == 1:
-                data_map['Label'].append(3)
-            elif i == 2:
-                data_map['Label'].append(2)
-    
-    df = pd.DataFrame(data_map, columns=['ID', 'Text', 'Label'])
-    df.to_csv(csv_file, index=False)
-    print('Done')
+random.seed(2104)
 
-def split(root_path):
-    data_path = os.path.join(root_path, 'data.csv')
-    train_file = os.path.join(root_path, 'train_data.csv')
-    test_file = os.path.join(root_path, 'test_data.csv')
-    df = pd.read_csv(data_path)
-    rows = len(df.axes[0])
-    X = df[df.columns[:2]]
-    y = df['Label']
-    df_train, df_test = train_test_split(df, test_size=0.2)
-    df_train.to_csv(train_file, index=False)
-    df_test.to_csv(test_file, index=False)
+TRAIN = 'train_train'
+VAL = 'train_val'
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--root', help='Path to the Dataset')
-    args = parser.parse_args()
+parser = argparse.ArgumentParser()
+parser.add_argument('--root', help='Path to the Dataset')
+parser.add_argument('--ratio', type=float, default=0.8,
+                    help='Ratio of the train set')
+args = parser.parse_args()
 
-    create_dataset(args.root)
-    split(args.root)
+# csv_file = os.path.join(args.root, 'data.csv')
+root_path = args.root
+ratio = args.ratio
+labels = ['5g_corona_conspiracy', 'other_conspiracy', 'non_conspiracy']
+data_map = {
+    'ID': [],
+    'Text': [],
+    'Label': []
+}
 
-if __name__ == "__main__":
-    main()
+for i in range(len(labels)):
+    path = os.path.join(root_path, labels[i] + '.json')
+    with open(path, 'r') as f:
+        data = json.load(f)
+    for j in range(len(data)):
+        data_map['ID'].append(data[j]['id_str'])
+        data_map['Text'].append(data[j]['full_text'])
+        data_map['Label'].append(i + 1)
+
+
+
+splits = {
+    TRAIN: dict(),
+    VAL: dict(),
+}
+# Split
+d = data_map
+for cls_id, cls_list in d.items():
+    train_sz = max(int(len(cls_list) * 0.8), 1)
+    shuffled = random.sample(cls_list, k=len(cls_list))
+    splits[TRAIN][cls_id] = shuffled[:train_sz]
+    splits[VAL][cls_id] = shuffled[train_sz:]
+
+# Save data
+df = pd.DataFrame(data_map, columns=['ID', 'Text', 'Label'])
+df.to_csv(f'{root_path}/data.csv', index=False)
+for split, data in splits.items():
+    df = pd.DataFrame(data, columns=['ID', 'Text', 'Label'])
+    df.to_csv(f'{root_path}/{split}.csv', index=False)
