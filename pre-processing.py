@@ -53,7 +53,9 @@ for cls_id, cls_list in d.items():
     splits[VAL][cls_id] = shuffled[train_sz:]
 
 # Save data
-os.system('mkdir ./data')
+if not os.path.isdir('./data'):
+    os.system('mkdir ./data') 
+
 df = pd.DataFrame(data_map, columns=['ID', 'Text', 'Label'])
 df.to_csv(f'{out_path}/data.csv', index=False)
 for split, data in splits.items():
