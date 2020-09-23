@@ -20,6 +20,7 @@ class Twitter(data.Dataset):
         self.data_dir = Path(data_root_dir)
         
         self.data = pd.read_csv(self.data_dir)
+        
         self.ids = self.data['ID']
         self.texts = self.data['Text']
         self.labels = self.data['Label']
