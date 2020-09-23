@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--root', help='Path to the Dataset')
 parser.add_argument('--ratio', type=float, default=0.8,
                     help='Ratio of the train set')
-parser.add_argument('--out', help='Path to data folder', default='./data/')
+parser.add_argument('--out', help='Path to data folder', default='./data')
 args = parser.parse_args()
 
 # csv_file = os.path.join(args.root, 'data.csv')
@@ -53,6 +53,7 @@ for cls_id, cls_list in d.items():
     splits[VAL][cls_id] = shuffled[train_sz:]
 
 # Save data
+os.system('mkdir ./data')
 df = pd.DataFrame(data_map, columns=['ID', 'Text', 'Label'])
 df.to_csv(f'{out_path}/data.csv', index=False)
 for split, data in splits.items():
