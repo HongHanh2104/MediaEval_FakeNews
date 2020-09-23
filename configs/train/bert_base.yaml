@@ -33,7 +33,7 @@ dataset:
     train:
         name: twitter_bert
         args:
-            data_root_dir: /media/honghanh/STORED_DATA/DATA/2020-Fake-News-Detection-Task-master/FakeNews/train_data.csv
+            data_root_dir: /media/honghanh/STORED_DATA/DATA/2020-Fake-News-Detection-Task-master/FakeNews/train_train.csv
             is_train: True
         loader:
             name: DataLoader #twitter_loader
@@ -44,7 +44,7 @@ dataset:
     val:
         name: twitter_bert
         args:
-            data_root_dir: /media/honghanh/STORED_DATA/DATA/2020-Fake-News-Detection-Task-master/FakeNews/test_data.csv
+            data_root_dir: /media/honghanh/STORED_DATA/DATA/2020-Fake-News-Detection-Task-master/FakeNews/train_val.csv
             is_train: False
         loader:
             name: DataLoader #twitter_loader

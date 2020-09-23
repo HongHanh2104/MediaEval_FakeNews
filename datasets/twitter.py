@@ -20,7 +20,7 @@ class Twitter(data.Dataset):
         self.data_dir = Path(data_root_dir)
         
         self.data = pd.read_csv(self.data_dir)
-        #self.ids = data['ID']
+        self.ids = self.data['ID']
         self.texts = self.data['Text']
         self.labels = self.data['Label']
         self.tokenizer = self.get_tokenizer('bert-base-uncased')
@@ -52,7 +52,7 @@ class Twitter(data.Dataset):
 
 
     def __len__(self):
-        return len(self.data)
+        return len(self.ids)
 
 class twitter_bert(Twitter):
     def __init__(self, data_root_dir, max_len=200, is_train=True):
