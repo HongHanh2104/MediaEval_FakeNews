@@ -14,7 +14,7 @@ optimizer:
 loss:
     name: CrossEntropyLoss
     args:
-        ignore_index: 3
+        #ignore_index: 3
         # ... more args
 metric:
     - name: Accuracy
@@ -33,18 +33,18 @@ dataset:
     train:
         name: twitter_bert
         args:
-            data_root_dir: /media/honghanh/STORED_DATA/DATA/2020-Fake-News-Detection-Task-master/FakeNews/train_train.csv
+            data_root_dir: ./data/train_train.csv
             is_train: True
         loader:
             name: DataLoader #twitter_loader
             args:
-                batch_size: 2
+                batch_size: 16
                 shuffle: True
                 # ... more args
     val:
         name: twitter_bert
         args:
-            data_root_dir: /media/honghanh/STORED_DATA/DATA/2020-Fake-News-Detection-Task-master/FakeNews/train_val.csv
+            data_root_dir: ./data/train_val.csv
             is_train: False
         loader:
             name: DataLoader #twitter_loader

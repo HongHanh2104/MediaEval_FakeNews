@@ -33,15 +33,17 @@ class Twitter(data.Dataset):
 
     def __getitem__(self, idx):
         text = self.texts[idx]
-        label = self.labels[idx]
+        label = self.labels[idx] - 1
         encoding = self.tokenizer.encode_plus(
             text,
             add_special_tokens=True,
             max_length=self.max_len,
             return_token_type_ids=False,
-            pad_to_max_length=True,
+            padding='max_length',
             return_attention_mask=True,
-            return_tensors='pt'
+            return_tensors='pt',
+            truncation=True
+            
         )
 
         return {
@@ -56,13 +58,13 @@ class Twitter(data.Dataset):
         return len(self.ids)
 
 class twitter_bert(Twitter):
-    def __init__(self, data_root_dir, max_len=200, is_train=True):
+    def __init__(self, data_root_dir, max_len=280, is_train=True):
         super(twitter_bert, self).__init__(
             data_root_dir, max_len=max_len, is_train=is_train
         )
 
     def get_tokenizer(self, pretrain=None):
-        return transformers.BertTokenizer.from_pretrained('bert-base-uncased', max_len=200)
+        return transformers.BertTokenizer.from_pretrained('bert-base-cased', max_len=280)
 
 def main():
     parser = argparse.ArgumentParser()
