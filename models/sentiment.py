@@ -17,7 +17,7 @@ class bert_base(nn.Module):
             attention_mask=attention_mask
         )
         output = self.drop(pooled_output)
-        return self.out(output)
+        return self.out(pooled_output)
 
 def main():
     model = SentimentClassifier(3)
