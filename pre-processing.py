@@ -39,6 +39,7 @@ for i, t in enumerate(tweets['Text']):
 def preprocess_data(data):
     # Remove numbers
     data = data.astype(str).str.replace('\d+', '')
+    data = data.astype(str).str.replace('@(\w+)', '')
     lower_text = data.str.lower()
     lemmatizer = nltk.stem.WordNetLemmatizer()
     w_tokenizer = TweetTokenizer()
@@ -63,9 +64,11 @@ tweets['Cleaned_Text'] = pre_tweets
 
 # Remove stopwords
 stop_words = set(stopwords.words('english'))
-tweets['Unstop_Text'] = tweets['Cleaned_Text'].apply(lambda x: [item for item in \
+unstop_text = tweets['Cleaned_Text'].apply(lambda x: [item for item in \
                                     x if item not in stop_words])
 
+tweets['Unstop_Text'] = unstop_text.apply(lambda x: [' '.join(x)])
+tweets['Cleaned_Text'] = tweets['Cleaned_Text'].apply(lambda x: [' '.join(x)])
 
-#print(tweets['Cleaned_Text'][0])
-tweets.to_csv(f'{root_path}/cleaned_{filename}.csv', index=False)
+#print(tweets['Unstop_Text'][0])
+tweets.to_csv(f'{root_path}/cleaned_{filename}', index=False)
