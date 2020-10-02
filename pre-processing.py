@@ -60,7 +60,15 @@ class TwitterPreprocessor:
         return self
 
     def remove_hashtags(self):
-        self.text = re.sub(pattern=get_hashtags_pattern(), repl='', string=self.text)
+        special_text = ['5G', '5g', 'virus', 'coronavirus', 'corona', 'conspiracy', 'COVID19']
+        text = re.findall(r'#(\w*)', self.text)
+        if any(t in text for t in special_text):
+            for t in text:
+                self.text = re.sub(pattern=re.compile(rf'#{t}'), repl=f'{t}', string=self.text) if t in special_text \
+                else re.sub(pattern=re.compile(rf'#{t}'), repl='', string=self.text)
+
+        else:
+            self.text = re.sub(pattern=get_hashtags_pattern(), repl='', string=self.text)
         return self
 
     def remove_emojis(self):
@@ -90,14 +98,19 @@ class TwitterPreprocessor:
                 new_sentence.append(w)
         self.text = ' '.join(new_sentence)
         return self
+    
+    def add_white_space(self):
+        self.text = re.sub(pattern='([.,!?()])', repl=r' \1', string=self.text)
+        self.text = re.sub(pattern='\s{2,}', repl=' ', string=self.text)
+        return self
 
 def preprocess_without_stopword(data):
-    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().remove_punctuation().text) \
+    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().add_white_space().text) \
          for t in data]
     return pd.DataFrame(texts)
 
 def preprocess_with_stopword(data):
-    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().remove_punctuation().remove_stopwords().text) \
+    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().remove_stopwords(extra_stopwords=['would', 'might']).add_white_space().text) \
          for t in data]
     return pd.DataFrame(texts)
 
