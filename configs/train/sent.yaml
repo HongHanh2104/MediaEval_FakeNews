@@ -4,7 +4,7 @@ seed: 21498
 model:
     name: bert_base
     args:
-        nclasses: 2
+        nclasses: 5
         # ... more args
 optimizer:
     name: AdamW
@@ -35,7 +35,7 @@ dataset:
     train:
         name: twitter_bert
         args:
-            data_root_dir: ./data/cleaned_train_train.csv
+            data_root_dir: data/sent/train_train.csv
             is_train: True
         loader:
             name: DataLoader
@@ -45,7 +45,7 @@ dataset:
     val:
         name: twitter_bert
         args:
-            data_root_dir: ./data/cleaned_train_val.csv
+            data_root_dir: data/sent/train_val.csv
             is_train: False
         loader:
             name: DataLoader

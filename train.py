@@ -61,7 +61,8 @@ def train(config):
     # 5: Define Scheduler
     set_seed(config['seed'])
     scheduler = get_instance(config['scheduler'],
-                             optimizer=optimizer)
+                             optimizer=optimizer,
+                             num_training_steps=len(train_dataloader) * config['trainer']['nepochs'])
 
     # 6: Define metrics
     set_seed(config['seed'])

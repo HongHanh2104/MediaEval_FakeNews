@@ -92,12 +92,12 @@ class TwitterPreprocessor:
         return self
 
 def preprocess_without_stopword(data):
-    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().remove_punctuation().text) \
+    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().text.replace('\n', '. ')) \
          for t in data]
     return pd.DataFrame(texts)
 
 def preprocess_with_stopword(data):
-    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().remove_punctuation().remove_stopwords().text) \
+    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().remove_stopwords().text.replace('\n', '. ')) \
          for t in data]
     return pd.DataFrame(texts)
 
