@@ -169,9 +169,9 @@ def preprocess_with_stopword(data):
          for t in data]
     return pd.DataFrame(texts)
 
-cleaned_text = preprocess_without_stopword(tweets['Text'])
-unstop_text = preprocess_with_stopword(tweets['Text'])
+#cleaned_text = preprocess_without_stopword(tweets['Text'])
+cleaned_text = preprocess_with_stopword(tweets['Text'])
 
 tweets['Cleaned_Text'] = cleaned_text
-tweets['Unstop_Text'] = unstop_text
 tweets.to_csv(f'{root_path}/cleaned_{filename}', index=False)
+print('Complete pre-precessing data!'.upper())
