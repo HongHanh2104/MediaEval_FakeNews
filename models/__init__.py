@@ -1,1 +1,1 @@
-from .sentiment import bert_base
+from .sentiment import *

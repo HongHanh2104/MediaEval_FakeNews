@@ -27,7 +27,7 @@ class Twitter(data.Dataset):
         self.labels = self.data['Label'].values
         self.tokenizer = self.get_tokenizer('bert-base-uncased')
 
-        self.tokenizer.add_tokens(['5g', 'coronavirus', 'covid'])
+        #self.tokenizer.add_tokens(['5g', 'coronavirus', 'covid'])
 
     def get_tokenizer(self, pretrain=None):
         if pretrain == None:

@@ -3,13 +3,39 @@ import torch.nn as nn
 import transformers
 from tqdm import tqdm
 
+__all__ = ['BaselineBERT', 'bert_base']
+
+class BaselineBERT(nn.Module):
+    def __init__(self, 
+                 nclasses, 
+                 version='bert-base-uncased', 
+                 drop_p=0.3, 
+                 freeze_bert=False, 
+                 freeze_embeddings=False):
+        super().__init__()
+        self.bert = transformers.BertModel.from_pretrained(version)
+        if freeze_bert:
+            for p in self.bert.parameters():
+                p.requires_grad = False
+        if freeze_embeddings:
+            self.bert.embeddings.requires_grad = False
+        self.drop = nn.Dropout(p=drop_p)
+        self.out = nn.Linear(self.bert.config.hidden_size, nclasses)
+    
+    def forward(self, input_ids, attention_mask):
+        _, pooled_output = self.bert(
+            input_ids=input_ids,
+            attention_mask=attention_mask
+        )
+        return self.out(self.drop(pooled_output))
+
 class bert_base(nn.Module):
     """Baseline model"""
     def __init__(self, nclasses):
         super().__init__()
         self.bert = transformers.BertModel.from_pretrained('bert-base-uncased')
         #print(self.bert)
-        self.bert.resize_token_embeddings(30525) 
+        #self.bert.resize_token_embeddings(30525) 
         #for p in self.bert.parameters():
         #    p.requires_grad = False
         #self.bert.embeddings.requires_grad = False

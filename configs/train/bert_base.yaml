@@ -1,5 +1,5 @@
 id: bert-baseline
-pretrained: Null
+pretrained: null
 seed: 21498
 model:
     name: bert_base
@@ -9,7 +9,7 @@ model:
 optimizer:
     name: AdamW
     args:
-        lr: 0.00002
+        lr: 0.000001
         correct_bias: False
         # ... more args
 loss:
@@ -35,7 +35,7 @@ dataset:
     train:
         name: twitter_bert
         args:
-            data_root_dir: ./data/cleaned_train_train.csv
+            data_root_dir: ./data/train_train.csv
             is_train: True
         loader:
             name: DataLoader
@@ -45,7 +45,7 @@ dataset:
     val:
         name: twitter_bert
         args:
-            data_root_dir: ./data/cleaned_train_val.csv
+            data_root_dir: ./data/train_val.csv
             is_train: False
         loader:
             name: DataLoader
