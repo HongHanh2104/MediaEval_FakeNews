@@ -23,41 +23,56 @@ root_path = args.root
 ratio = args.ratio
 out_path = args.out
 labels = ['5g_corona_conspiracy', 'other_conspiracy', 'non_conspiracy']
+
 data_map = {
-    'ID': [],
-    'Text': [],
-    'Label': []
+
 }
 
 for i in range(len(labels)):
+    data_map.setdefault(labels[i], [])
     path = os.path.join(root_path, labels[i] + '.json')
     with open(path, 'r') as f:
         data = json.load(f)
     for j in range(len(data)):
-        data_map['ID'].append(data[j]['id_str'])
-        data_map['Text'].append(data[j]['full_text'])
-        data_map['Label'].append(i + 1)
+        id_str = data[j]['id_str']
+        text = data[j]['full_text']
+        label = i + 1
+        data_map[labels[i]].append((id_str, text, label))
+data_out = [['ID', 'Text', 'Label']]
+for k, v in data_map.items():
+    data_out.extend([
+        [id_str, text, label] for id_str, text, label in v
+    ])
+# Save data
+if not os.path.isdir('./data'):
+    os.system('mkdir ./data') 
 
-
+csv.writer(open(f'{out_path}/data.csv', 'w')).writerows(data_out)
 
 splits = {
     TRAIN: dict(),
     VAL: dict(),
 }
+
+for id_str, value_list in data_map.items():
+    train_sz = max(int(len(value_list) * 0.8), 1)
+    shuffled = random.sample(value_list, k=len(value_list))
+    splits[TRAIN][id_str] = shuffled[:train_sz]
+    splits[VAL][id_str] = shuffled[train_sz:]
+
 # Split
-d = data_map
-for cls_id, cls_list in d.items():
-    train_sz = max(int(len(cls_list) * 0.8), 1)
-    shuffled = random.sample(cls_list, k=len(cls_list))
-    splits[TRAIN][cls_id] = shuffled[:train_sz]
-    splits[VAL][cls_id] = shuffled[train_sz:]
+for split, labels in splits.items():
+    out = [['ID', 'Text', 'Label']]
+    out.extend([
+        [id_str, text, lb]
+        for _class, values in labels.items()
+        for id_str, text, lb in values
+    ])
+    csv.writer(open(f'{out_path}/{split}.csv', 'w')).writerows(out)
 
-# Save data
-if not os.path.isdir('./data'):
-    os.system('mkdir ./data') 
 
-df = pd.DataFrame(data_map, columns=['ID', 'Text', 'Label'])
-df.to_csv(f'{out_path}/data.csv', index=False)
-for split, data in splits.items():
-    df = pd.DataFrame(data, columns=['ID', 'Text', 'Label'])
-    df.to_csv(f'{out_path}/{split}.csv', index=False)
+# df = pd.DataFrame(data_map, columns=['ID', 'Text', 'Label'])
+# df.to_csv(f'{out_path}/data.csv', index=False)
+# for split, data in splits.items():
+#     df = pd.DataFrame(data, columns=['ID', 'Text', 'Label'])
+#     df.to_csv(f'{out_path}/{split}.csv', index=False)
