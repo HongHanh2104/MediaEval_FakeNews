@@ -37,12 +37,12 @@ for i in range(len(labels)):
         id_str = data[j]['id_str']
         text = data[j]['full_text']
         label = i + 1
-        data_map[labels[i]].append((id_str, text, label))
+        data_map[labels[i]].append((id_str, label, text))
 
-data_out = [['ID', 'Text', 'Label']]
+data_out = [['ID', 'Label', 'Text']]
 for k, v in data_map.items():
     data_out.extend([
-        [id_str, text, label] for id_str, text, label in v
+        [id_str, label, text] for id_str, label, text in v
     ])
 
 # Save data

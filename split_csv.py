@@ -23,13 +23,12 @@ random.seed(args.seed)
 
 # Load CSV
 df = pd.read_csv(args.csv)
-data = df[['ID', 'Cleaned_Text', 'Label']].values
+data = df[['ID', 'Label', 'Text', 'hashtag', 'Cleaned_Text']].values
 
-# Build class to image_fns dictionary
 d = dict()
-for fn, txt, lb in data:
+for id_str, lb, txt, hashtag, clean_txt in data:
     d.setdefault(lb, [])
-    d[lb].append((fn, txt))
+    d[lb].append((id_str, txt, hashtag, clean_txt))
 
 splits = {
     TRAIN: dict(),
@@ -44,11 +43,11 @@ for lb, value_list in d.items():
 
 # Split
 for split, labels in splits.items():
-    out = [['ID', 'Cleaned_Text', 'Label']]
+    out = [['ID', 'Label', 'Text', 'hashtag', 'Cleaned_Text']]
     out.extend([
-        [id_str, text, lb]
+        [id_str, lb, txt, hashtag, cleaned_txt]
         for lb, values in labels.items()
-        for id_str, text in values
+        for id_str, txt, hashtag, cleaned_txt in values
     ])
     csv.writer(open(f'{args.out}/{split}.csv', 'w')).writerows(out)
 
