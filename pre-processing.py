@@ -155,8 +155,8 @@ class TwitterPreprocessor:
         return self
     
     def add_white_space(self):
-        self.text = re.sub(pattern='([.,!?()])', repl=r' \1', string=self.text)
-        self.text = re.sub(pattern='\s{2,}', repl=' ', string=self.text)
+        self.text = re.sub(pattern=r"([\w/'+$\s-]+|[^\w/'+$\s-]+)\s*", repl=r"\1", string=self.text)
+        #self.text = re.sub(pattern='\s{2,}', repl=' ', string=self.text)
         return self
 
 def preprocess_without_stopword(data):
@@ -165,7 +165,7 @@ def preprocess_without_stopword(data):
     return pd.DataFrame(texts)
 
 def preprocess_with_stopword(data):
-    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().add_white_space().remove_punctuation().remove_blank_spaces().remove_stopwords(extra_stopwords=['would', 'might']).remove_numbers(preserve_years=True).text) \
+    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().add_white_space().remove_blank_spaces().remove_stopwords(extra_stopwords=['would', 'might']).remove_numbers(preserve_years=True).text) \
          for t in data]
     return pd.DataFrame(texts)
 
