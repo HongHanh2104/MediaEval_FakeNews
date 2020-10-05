@@ -164,11 +164,7 @@ def preprocess_without_stopword(data):
     return pd.DataFrame(texts)
 
 def preprocess_with_stopword(data):
-<<<<<<< HEAD
     texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().remove_blank_spaces().add_white_space().remove_stopwords(extra_stopwords=['would', 'might']).remove_numbers(preserve_years=True).text) \
-=======
-    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().add_white_space().remove_blank_spaces().remove_stopwords(extra_stopwords=['would', 'might']).remove_numbers(preserve_years=True).text) \
->>>>>>> origin/master
          for t in data]
     return pd.DataFrame(texts)
 
