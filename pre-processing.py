@@ -43,11 +43,11 @@ def get_hashtags_pattern():
 
 def get_emojis_pattern():
     emojis_pattern = re.compile(pattern = '['
-        u'\U0001F600-\U0001F64F'  # emoticons
-        u'\U0001F300-\U0001F5FF'  # symbols & pictographs
-        u'\U0001F680-\U0001F6FF'  # transport & map symbols
-        u'\U0001F1E0-\U0001F1FF'  # flags (iOS)
-        u'\U00002500-\U00002BEF'  # chinese char
+        u'\U0001F600-\U0001F64F'  
+        u'\U0001F300-\U0001F5FF' 
+        u'\U0001F680-\U0001F6FF'  
+        u'\U0001F1E0-\U0001F1FF'  
+        u'\U00002500-\U00002BEF'  
         u'\U00002702-\U000027B0'
         u'\U000024C2-\U0001F251'
         u'\U0001f926-\U0001f937'
@@ -58,7 +58,7 @@ def get_emojis_pattern():
         u'\u23cf'
         u'\u23e9'
         u'\u231a'
-        u'\ufe0f'  # dingbats
+        u'\ufe0f'  
         u'\u3030'
                            ']+', flags=re.UNICODE)
     return emojis_pattern
@@ -117,7 +117,7 @@ class TwitterPreprocessor:
         return self
 
     def remove_numbers(self, preserve_years=False):
-        text_list = self.text.split(' ')
+        text_list = self.text.split()
         new_sentence = []
         for text in text_list:
             if text.isnumeric():
@@ -155,16 +155,16 @@ class TwitterPreprocessor:
         return self
     
     def add_white_space(self):
-        self.text = re.sub(pattern=r"([\w/'+$\s-]+|[^\w/'+$\s-]+)\s*", repl=r"\1", string=self.text)
+        self.text = re.sub(pattern=r"([\w/'+$\s-]+|[^\w/'+$\s-]+)\s*", repl=r"\1 ", string=self.text)
         return self
 
-def preprocess_without_stopword(data):
-    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().remove_punctuation().remove_blank_spaces().add_white_space().text) \
-         for t in data]
-    return pd.DataFrame(texts)
+# def preprocess_without_stopword(data):
+#     texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().remove_punctuation().remove_blank_spaces().add_white_space().text) \
+#          for t in data]
+#     return pd.DataFrame(texts)
 
 def preprocess_with_stopword(data):
-    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().remove_blank_spaces().add_white_space().remove_stopwords(extra_stopwords=['would', 'might']).remove_numbers(preserve_years=True).text) \
+    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().remove_blank_spaces().remove_stopwords(extra_stopwords=['would', 'might']).remove_numbers(preserve_years=True).text) \
          for t in data]
     return pd.DataFrame(texts)
 
