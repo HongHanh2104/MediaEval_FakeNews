@@ -6,6 +6,7 @@ import nltk
 from nltk import word_tokenize, sent_tokenize, FreqDist
 from nltk.corpus import stopwords
 #nltk.download
+#nltk.download('words')
 #nltk.download('wordnet')
 #nltk.download('stopwords')
 #nltk.download('punkt')
@@ -28,6 +29,9 @@ tweets = pd.read_csv(os.path.join(root_path, filename))
 # Create hashtag column
 tweets['hashtag'] = tweets['Text'].apply(lambda x: re.findall(r"#(\w+)", x))
 
+MIN_YEAR = 1900
+MAX_YEAR = 2100
+
 def get_url_patern():
     return re.compile(
         r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))'
@@ -38,17 +42,38 @@ def get_hashtags_pattern():
     return re.compile(r'#\w*')
 
 def get_emojis_pattern():
-    try:
-        # UCS-4
-        emojis_pattern = re.compile(u'([\U00002600-\U000027BF])|([\U0001f300-\U0001f64F])|([\U0001f680-\U0001f6FF])')
-    except re.error:
-        # UCS-2
-        emojis_pattern = re.compile(
-            u'([\u2600-\u27BF])|([\uD83C][\uDF00-\uDFFF])|([\uD83D][\uDC00-\uDE4F])|([\uD83D][\uDE80-\uDEFF])')
+    emojis_pattern = re.compile(pattern = '['
+        u'\U0001F600-\U0001F64F'  # emoticons
+        u'\U0001F300-\U0001F5FF'  # symbols & pictographs
+        u'\U0001F680-\U0001F6FF'  # transport & map symbols
+        u'\U0001F1E0-\U0001F1FF'  # flags (iOS)
+        u'\U00002500-\U00002BEF'  # chinese char
+        u'\U00002702-\U000027B0'
+        u'\U000024C2-\U0001F251'
+        u'\U0001f926-\U0001f937'
+        u'\U00010000-\U0010ffff'
+        u'\u2640-\u2642'
+        u'\u2600-\u2B55'
+        u'\u200d'
+        u'\u23cf'
+        u'\u23e9'
+        u'\u231a'
+        u'\ufe0f'  # dingbats
+        u'\u3030'
+                           ']+', flags=re.UNICODE)
     return emojis_pattern
 
 def get_mentions_pattern():
     return re.compile(r'@\w*')
+
+def get_blank_spaces_pattern():
+    return re.compile(r'\s{2,}|\t')
+
+def is_year(text):
+    if (len(text) == 3 or len(text) == 4) and (MIN_YEAR < len(text) < MAX_YEAR):
+        return True
+    else:
+        return False
 
 class TwitterPreprocessor:
     def __init__(self, text):
@@ -83,8 +108,38 @@ class TwitterPreprocessor:
         self.text = self.text.translate(str.maketrans('', '', string.punctuation))
         return self
 
+    def remove_blank_spaces(self):
+        self.text = re.sub(pattern=get_blank_spaces_pattern(), repl=' ', string=self.text)
+        return self
+
     def lowercase(self):
         self.text = self.text.lower()
+        return self
+
+    def remove_numbers(self, preserve_years=False):
+        text_list = self.text.split(' ')
+        new_sentence = []
+        for text in text_list:
+            if text.isnumeric():
+                if preserve_years:
+                    if is_year(text):
+                        new_sentence.append(text)
+            else:
+                new_sentence.append(text)
+
+        self.text = ' '.join(new_sentence)
+        return self
+    
+    def remove_nonEnglish(self, extra_nonEnglish=None):
+        if extra_nonEnglish is None:
+            extra_nonEnglish = []
+        text = nltk.word_tokenize(self.text)
+        english_words = set(nltk.corpus.words.words())
+        new_sentence = []
+        for w in text:
+            if w not in english_words and w not in extra_nonEnglish:
+                new_sentence.append(w)
+        self.text = ' '.join(new_sentence)
         return self
 
     def remove_stopwords(self, extra_stopwords=None):
@@ -105,18 +160,18 @@ class TwitterPreprocessor:
         return self
 
 def preprocess_without_stopword(data):
-    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().add_white_space().text) \
+    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().remove_punctuation().remove_blank_spaces().add_white_space().text) \
          for t in data]
     return pd.DataFrame(texts)
 
 def preprocess_with_stopword(data):
-    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().remove_stopwords(extra_stopwords=['would', 'might']).add_white_space().text) \
+    texts = [(TwitterPreprocessor(t).lowercase().remove_urls().remove_hashtags().remove_emojis().remove_mentions().add_white_space().remove_punctuation().remove_blank_spaces().remove_stopwords(extra_stopwords=['would', 'might']).remove_numbers(preserve_years=True).text) \
          for t in data]
     return pd.DataFrame(texts)
 
-cleaned_text = preprocess_without_stopword(tweets['Text'])
-unstop_text = preprocess_with_stopword(tweets['Text'])
+#cleaned_text = preprocess_without_stopword(tweets['Text'])
+cleaned_text = preprocess_with_stopword(tweets['Text'])
 
 tweets['Cleaned_Text'] = cleaned_text
-tweets['Unstop_Text'] = unstop_text
 tweets.to_csv(f'{root_path}/cleaned_{filename}', index=False)
+print('Complete pre-precessing data!'.upper())
