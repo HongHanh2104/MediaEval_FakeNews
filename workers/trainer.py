@@ -103,8 +103,10 @@ class Trainer():
             loss = self.criterion(outs, lbl)
             # 5: Calculate gradients
             loss.backward()
+            nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
             # 6: Performing backpropagation
             self.optimier.step()
+            self.scheduler.step()
             with torch.no_grad():
                 # 7: Update loss
                 running_loss.add(loss.item())
@@ -191,7 +193,7 @@ class Trainer():
                 print('-----------------------------------')
 
                 # 3: Learning rate scheduling
-                self.scheduler.step(self.val_loss[-1])
+                #self.scheduler.step(self.val_loss[-1])
 
                 # 4: Saving checkpoints
                 if not self.debug:

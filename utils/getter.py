@@ -1,4 +1,6 @@
 from torch.optim import SGD, Adam, RMSprop
+from transformers import AdamW, get_linear_schedule_with_warmup
+
 from torch.optim.lr_scheduler import ReduceLROnPlateau, StepLR
 from torch.utils.data import DataLoader, random_split
 
