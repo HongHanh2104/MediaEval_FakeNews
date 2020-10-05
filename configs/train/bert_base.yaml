@@ -4,7 +4,7 @@ seed: 21498
 model:
     name: bert_base
     args:
-        nclasses: 2
+        nclasses: 3
         # ... more args
 optimizer:
     name: AdamW

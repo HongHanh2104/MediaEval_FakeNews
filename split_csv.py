@@ -23,7 +23,7 @@ random.seed(args.seed)
 
 # Load CSV
 df = pd.read_csv(args.csv)
-data = df[['ID', 'Cleaned_Text', 'Label']].values
+data = df[['ID', 'Text', 'Label']].values
 
 # Build class to image_fns dictionary
 d = dict()
@@ -44,7 +44,7 @@ for cls_id, cls_list in d.items():
 
 # Save split
 for split, classes in splits.items():
-    out = [['ID', 'Cleaned_Text', 'Label']]
+    out = [['ID', 'Text', 'Label']]
     out.extend([
         [fn[0], fn[1], cl]
         for cl, fns in classes.items()

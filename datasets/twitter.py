@@ -20,7 +20,7 @@ class Twitter(data.Dataset):
         self.data_dir = Path(data_root_dir)
         
         self.data = pd.read_csv(self.data_dir)
-        self.data = self.data[(self.data['Label'] != 2).values]
+        #self.data = self.data[(self.data['Label'] != 2).values]
         
         self.ids = self.data['ID'].values
         self.texts = self.data['Cleaned_Text'].values
@@ -36,7 +36,8 @@ class Twitter(data.Dataset):
 
     def __getitem__(self, idx):
         text = self.texts[idx]
-        label = 0 if self.labels[idx] < 2 else 1
+        #label = 0 if self.labels[idx] < 2 else 1
+        label = self.labels[idx] - 1
         encoding = self.tokenizer.encode_plus(
             text,
             add_special_tokens=True,
