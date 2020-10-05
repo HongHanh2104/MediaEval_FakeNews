@@ -51,24 +51,3 @@ if not os.path.isdir('./data'):
 
 csv.writer(open(f'{out_path}/data.csv', 'w')).writerows(data_out)
 print('COMPLETE CONVERTING TO CSV FILE.')
-# splits = {
-#     TRAIN: dict(),
-#     VAL: dict(),
-# }
-
-# for id_str, value_list in data_map.items():
-#     train_sz = max(int(len(value_list) * 0.8), 1)
-#     shuffled = random.sample(value_list, k=len(value_list))
-#     splits[TRAIN][id_str] = shuffled[:train_sz]
-#     splits[VAL][id_str] = shuffled[train_sz:]
-
-# # Split
-# for split, labels in splits.items():
-#     out = [['ID', 'Text', 'Label']]
-#     out.extend([
-#         [id_str, text, lb]
-#         for _class, values in labels.items()
-#         for id_str, text, lb in values
-#     ])
-#     csv.writer(open(f'{out_path}/{split}.csv', 'w')).writerows(out)
-
