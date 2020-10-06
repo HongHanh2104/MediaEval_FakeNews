@@ -1,8 +1,8 @@
-id: bert-baseline
+id: TwitterBERT-FreezeAll-CleanedText
 pretrained: null
 seed: 21498
 model:
-    name: bert_base
+    name: TwitterBERT
     args:
         nclasses: 3
         # ... more args
@@ -40,7 +40,7 @@ dataset:
         loader:
             name: DataLoader
             args:
-                batch_size: 32
+                batch_size: 8
                 shuffle: True
     val:
         name: twitter_bert

@@ -12,7 +12,8 @@ from pathlib import Path
 class Twitter(data.Dataset):
     def __init__(self,
                  data_root_dir=None,
-                 max_len=200, 
+                 pretrain='bert-base-uncased',
+                 max_len=128, 
                  is_train=True):
         super().__init__()
 
@@ -25,14 +26,9 @@ class Twitter(data.Dataset):
         self.ids = self.data['ID'].values
         self.texts = self.data['Cleaned_Text'].values
         self.labels = self.data['Label'].values
-        self.tokenizer = self.get_tokenizer('bert-base-uncased')
+        self.tokenizer = self.get_tokenizer(pretrain, max_len)
 
         #self.tokenizer.add_tokens(['5g', 'coronavirus', 'covid'])
-
-    def get_tokenizer(self, pretrain=None):
-        if pretrain == None:
-            return transformers.BertTokenizer
-        return transformers.BertTokenizer.from_pretrained(pretrain)
 
     def __getitem__(self, idx):
         text = self.texts[idx]
@@ -61,14 +57,16 @@ class Twitter(data.Dataset):
     def __len__(self):
         return len(self.ids)
 
+
 class twitter_bert(Twitter):
     def __init__(self, data_root_dir, max_len=128, is_train=True):
         super(twitter_bert, self).__init__(
             data_root_dir, max_len=max_len, is_train=is_train
         )
 
-    def get_tokenizer(self, pretrain=None):
-        return transformers.BertTokenizer.from_pretrained('bert-base-uncased', max_len=128)
+    def get_tokenizer(self, pretrain='bert-base-uncased', max_len=128):
+        return transformers.BertTokenizer.from_pretrained(pretrain, max_len=max_len)
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -77,7 +75,6 @@ def main():
 
     twitter = Twitter(args.root)
     #print(twitter.__getitem__(47))
-
 
 
 if __name__ == "__main__":
