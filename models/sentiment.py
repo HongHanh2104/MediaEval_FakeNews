@@ -3,7 +3,11 @@ import torch.nn as nn
 import transformers
 from tqdm import tqdm
 
-__all__ = ['BaselineBERT', 'bert_base']
+__all__ = ['BaselineBERT', 'TwitterBERT']
+
+def set_freeze_module(m, state=False):
+    for p in m.parameters():
+        p.requires_grad = state
 
 class BaselineBERT(nn.Module):
     def __init__(self, 
@@ -15,10 +19,9 @@ class BaselineBERT(nn.Module):
         super().__init__()
         self.bert = transformers.BertModel.from_pretrained(version)
         if freeze_bert:
-            for p in self.bert.parameters():
-                p.requires_grad = False
+            set_freeze_module(self.bert)
         if freeze_embeddings:
-            self.bert.embeddings.requires_grad = False
+            set_freeze_module(self.bert.embeddings)
         self.drop = nn.Dropout(p=drop_p)
         self.out = nn.Linear(self.bert.config.hidden_size, nclasses)
     
@@ -29,31 +32,24 @@ class BaselineBERT(nn.Module):
         )
         return self.out(self.drop(pooled_output))
 
-class bert_base(nn.Module):
-    """Baseline model"""
-    def __init__(self, nclasses):
+class TwitterBERT(nn.Module):
+    def __init__(self, 
+                 nclasses,
+                 freeze_bert=False, 
+                 freeze_embeddings=False):
         super().__init__()
-        self.bert = transformers.BertModel.from_pretrained('bert-base-uncased')
-        #print(self.bert)
-        #self.bert.resize_token_embeddings(30525) 
-        #for p in self.bert.parameters():
-        #    p.requires_grad = False
-        #self.bert.embeddings.requires_grad = False
-        #self.bert = transformers.BertForPreTraining.from_pretrained('digitalepidemiologylab/covid-twitter-bert')
-        self.drop = nn.Dropout(p=0.3)
-        self.out = nn.Linear(1024, nclasses)
-        self.lstm = nn.LSTM(self.bert.config.hidden_size, 512, bidirectional=True, batch_first=True)
+        self.bert = transformers.BertForPreTraining.from_pretrained('digitalepidemiologylab/covid-twitter-bert')
+        self.bert.cls.seq_relationship = nn.Linear(1024, nclasses, bias=True)
+        if freeze_bert:
+            set_freeze_module(self.bert)
+        if freeze_embeddings:
+            set_freeze_module(self.bert.embeddings)
     
     def forward(self, input_ids, attention_mask):
-        #hs = self.bert.embeddings(input_ids, attention_mask)
-        hs, pooled_output = self.bert(
+        return self.bert(
             input_ids=input_ids,
             attention_mask=attention_mask
-        )
-        hs = self.drop(hs)
-        hs, _ = self.lstm(hs)
-        h = hs.mean(1)
-        return self.out(h)
+        )[1]
 
 def main():
     model = SentimentClassifier(3)
