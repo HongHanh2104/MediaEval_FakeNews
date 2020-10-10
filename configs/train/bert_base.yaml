@@ -1,4 +1,4 @@
-id: TwitterBERT-FreezeAll-CleanedText
+id: TwitterBERT2-FullText-Len96-BS12
 pretrained: null
 seed: 21498
 model:
@@ -37,16 +37,18 @@ dataset:
         args:
             data_root_dir: ./data/train_train.csv
             is_train: True
+            max_len: 96
         loader:
             name: DataLoader
             args:
-                batch_size: 8
+                batch_size: 12
                 shuffle: True
     val:
         name: twitter_bert
         args:
             data_root_dir: ./data/train_val.csv
             is_train: False
+            max_len: 96
         loader:
             name: DataLoader
             args:
