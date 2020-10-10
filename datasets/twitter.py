@@ -40,7 +40,7 @@ class Twitter(data.Dataset):
         self.init_augmenter()
 
     def init_augmenter(self):
-        self.aug_insert = naw.ContextualWordEmbsAug(model_path='bert-base-uncased', action='insert').cuda()
+        self.aug_insert = naw.ContextualWordEmbsAug(model_path='bert-base-uncased', action='insert')
         self.aug_subs = naw.ContextualWordEmbsAug(model_path='bert-base-uncased', action='substitute')
 
     def augment(self, text):
