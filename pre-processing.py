@@ -172,5 +172,6 @@ def preprocess_with_stopword(data):
 cleaned_text = preprocess_with_stopword(tweets['Text'])
 
 tweets['Cleaned_Text'] = cleaned_text
+tweets = tweets[['ID', 'Label', 'Text', 'hashtag', 'Cleaned_Text']]
 tweets.to_csv(f'{root_path}/cleaned_{filename}', index=False)
 print('Complete pre-precessing data!'.upper())

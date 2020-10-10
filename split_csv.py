@@ -3,6 +3,8 @@ import csv
 import argparse
 import random
 
+print('Make sure your CSV has the first column for ID and the second column for class label')
+
 TRAIN = 'train_train'
 VAL = 'train_val'
 
@@ -23,12 +25,12 @@ random.seed(args.seed)
 
 # Load CSV
 df = pd.read_csv(args.csv)
-data = df[['ID', 'Label', 'Text', 'hashtag', 'Cleaned_Text']].values
+data = df.values
 
 d = dict()
-for id_str, lb, txt, hashtag, clean_txt in data:
+for id_str, lb, *metadata in data:
     d.setdefault(lb, [])
-    d[lb].append((id_str, txt, hashtag, clean_txt))
+    d[lb].append((id_str, *metadata))
 
 splits = {
     TRAIN: dict(),
@@ -43,11 +45,11 @@ for lb, value_list in d.items():
 
 # Split
 for split, labels in splits.items():
-    out = [['ID', 'Label', 'Text', 'hashtag', 'Cleaned_Text']]
+    out = [list(df.keys())]
     out.extend([
-        [id_str, lb, txt, hashtag, cleaned_txt]
+        [id_str, lb, *metadata]
         for lb, values in labels.items()
-        for id_str, txt, hashtag, cleaned_txt in values
+        for id_str, *metadata in values
     ])
     csv.writer(open(f'{args.out}/{split}.csv', 'w')).writerows(out)
 
