@@ -1,0 +1,58 @@
+id: ResnetBaseline
+pretrained: null
+seed: 21498
+model:
+    name: ImageClassifier
+    args:
+        nclasses: 3
+        # ... more args
+optimizer:
+    name: Adam
+    args:
+        lr: 0.000001
+        correct_bias: False
+        # ... more args
+loss:
+    name: CrossEntropyLoss
+    args:
+
+        #ignore_index: 3
+        # ... more args
+metric:
+    - name: Accuracy
+      args:
+      
+scheduler:
+    name: get_linear_schedule_with_warmup
+    args:
+        num_warmup_steps: 0
+    #name: ReduceLROnPlateau
+    #args:
+    #    mode: min
+    #    factor: 0.5
+    #    patience: 5
+    #    verbose: True
+dataset:
+    train:
+        name: TwitterImageDataset
+        args:
+            data_root_dir: ./data/image/train_train.csv
+            is_train: True
+        loader:
+            name: DataLoader
+            args:
+                batch_size: 12
+                shuffle: True
+    val:
+        name: TwitterImageDataset
+        args:
+            data_root_dir: ./data/image/train_val.csv
+            is_train: False
+        loader:
+            name: DataLoader
+            args:
+                batch_size: 8
+trainer:
+    nepochs: 50
+    val_step: 1
+    log_step: 1
