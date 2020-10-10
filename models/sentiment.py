@@ -18,6 +18,7 @@ class BaselineBERT(nn.Module):
                  freeze_embeddings=False):
         super().__init__()
         self.bert = transformers.BertModel.from_pretrained(version)
+        #self.bert.resize_token_embeddings(30525) 
         if freeze_bert:
             set_freeze_module(self.bert)
         if freeze_embeddings:
@@ -38,7 +39,7 @@ class TwitterBERT(nn.Module):
                  freeze_bert=False, 
                  freeze_embeddings=False):
         super().__init__()
-        self.bert = transformers.BertForPreTraining.from_pretrained('digitalepidemiologylab/covid-twitter-bert')
+        self.bert = transformers.BertForPreTraining.from_pretrained('digitalepidemiologylab/covid-twitter-bert-v2')
         self.bert.cls.seq_relationship = nn.Linear(1024, nclasses, bias=True)
         if freeze_bert:
             set_freeze_module(self.bert)
