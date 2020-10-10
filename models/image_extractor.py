@@ -9,13 +9,14 @@ class ImageExtractor(nn.Module):
                  nclasses):
         super().__init__()
         self.model = models.resnet50(pretrained=True)
-        self.classifier = nn.Linear(self.model.fc.in_features, nclasses)
+        self.feature_dim = self.model.fc.in_features
+        self.classifier = nn.Linear(self.feature_dim, nclasses)
 
     def forward(self, x):
-        features = self.model(x)
-        out = F.relu(features, inplace=True)
-        out = F.avg_pool2d(out, kernel_size=2).view(features.size(0), -1)
-        out = F.sigmoid(self.classifier(out))
+        features = self.model(x) # [B, D, H', W']
+        out = F.avg_pool2d(features, (1, 1)) # [B, D, 1, 1]
+        out = out.view(-1, self.feature_dim)
+        out = self.classifier(out)
         return out
 
 def main():
