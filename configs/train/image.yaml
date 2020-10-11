@@ -7,7 +7,7 @@ model:
         nclasses: 3
         # ... more args
 optimizer:
-    name: Adam
+    name: AdamW
     args:
         lr: 0.000001
         correct_bias: False

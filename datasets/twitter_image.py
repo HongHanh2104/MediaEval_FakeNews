@@ -44,9 +44,11 @@ class TwitterImageDataset(Dataset):
     def __getitem__(self, idx):
         image = self.images[idx]
         label = self.labels[idx]
+        label = torch.LongTensor(label)
         path = self.image_path / (str(image) + '.png')
         image = Image.open(path)
-        return self.transforms(image), label     
+        image = self.transforms(image)
+        return image, label      
 
     def __len__(self):
         return len(self.images)
