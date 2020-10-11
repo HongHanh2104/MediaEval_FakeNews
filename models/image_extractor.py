@@ -8,15 +8,19 @@ class ImageClassifier(nn.Module):
     def __init__(self,
                  nclasses):
         super().__init__()
-        self.model = models.resnet50(pretrained=True)
-        self.feature_dim = self.model.fc.in_features
+        cnn = models.resnet50(pretrained=True)
+        self.feature_dim = cnn.fc.in_features
+        self.model = nn.Sequential(*list(cnn.children())[:-1])
         self.classifier = nn.Linear(self.feature_dim, nclasses)
 
     def forward(self, x):
+        #print(x.shape)
         features = self.model(x) # [B, D, H', W']
-        out = F.avg_pool2d(features, (1, 1)) # [B, D, 1, 1]
-        out = out.view(-1, self.feature_dim)
+        #print(features.shape)
+        out = features.view(-1, self.feature_dim)
+        #print(out.shape)
         out = self.classifier(out)
+        #print(out.shape)
         return out
 
 def main():

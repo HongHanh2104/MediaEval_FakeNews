@@ -37,7 +37,6 @@ def train(config):
     set_seed(config['seed'])
     train_dataloader, val_dataloader = \
         get_data(config['dataset'], config['seed'])
-
     # 2: Define network
     set_seed(config['seed'])
     model = get_instance(config['model']).to(device)
