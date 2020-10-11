@@ -57,7 +57,7 @@ def main():
     parser.add_argument('--image')
     args = parser.parse_args()
 
-    dataset = TwitterImageDataset(args.csv, args.image, classes=3)
+    dataset = TwitterImageDataset(args.csv, args.image)
     dataset.__getitem__(1)
 
 

@@ -36,7 +36,8 @@ dataset:
     train:
         name: TwitterImageDataset
         args:
-            data_root_dir: ./data/image/train_train.csv
+            csv_data: ./data/image/train_train.csv
+            img_path: ./data/new_images
             is_train: True
         loader:
             name: DataLoader
@@ -46,7 +47,8 @@ dataset:
     val:
         name: TwitterImageDataset
         args:
-            data_root_dir: ./data/image/train_val.csv
+            csv_data: ./data/image/train_val.csv
+            img_path: ./data/new_images
             is_train: False
         loader:
             name: DataLoader
