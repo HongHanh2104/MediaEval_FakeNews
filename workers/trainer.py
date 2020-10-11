@@ -86,19 +86,15 @@ class Trainer():
         self.model.train()
         print('Training........')
         progress_bar = tqdm(dataloader)
-        for i, x in enumerate(progress_bar):
-            # 1: Load img_inputs and labels
-            input_ids = move_to(x['input_ids'], self.device)
-            attention_mask = move_to(x['attention_mask'], self.device)
-            lbl = move_to(x['labels'], self.device)
+        for i, (inp, lbl) in enumerate(progress_bar):
+            # 1: Load img_inputs and labels         
+            inp = move_to(inp, self.device)
+            lbl = move_to(lbl, self.device)
 
             # 2: Clear gradients from previous iteration
             self.optimier.zero_grad()
             # 3: Get network outputs
-            outs = self.model(
-                input_ids,
-                attention_mask
-            )
+            outs = self.model(inp)
             # 4: Calculate the loss
             loss = self.criterion(outs, lbl)
             # 5: Calculate gradients
@@ -139,16 +135,12 @@ class Trainer():
         self.model.eval()
         print('Evaluating........')
         progress_bar = tqdm(dataloader)
-        for i, x in enumerate(progress_bar):
+        for i, (inp, lbl) in enumerate(progress_bar):
             # 1: Load inputs and labels
-            input_ids = move_to(x['input_ids'], self.device)
-            attention_mask = move_to(x['attention_mask'], self.device)
-            lbl = move_to(x['labels'], self.device)
+            inp = move_to(inp, self.device)
+            lbl = move_to(lbl, self.device)
             # 2: Get network outputs
-            outs = self.model(
-                input_ids,
-                attention_mask
-            )
+            outs = self.model(inp)
             # 3: Calculate the loss
             loss = self.criterion(outs, lbl)
             # 4: Update loss
