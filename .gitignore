@@ -143,3 +143,4 @@ data/
 runs/
 .ipynb_checkpoints/
 backup
+*.swp

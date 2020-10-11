@@ -37,21 +37,22 @@ class Twitter(data.Dataset):
 
         self.is_train = is_train
         #self.tokenizer.add_tokens(['5g', 'coronavirus', 'covid'])
-        self.init_augmenter()
+        #self.init_augmenter()
 
     def init_augmenter(self):
-        self.aug_insert = naw.ContextualWordEmbsAug(model_path='bert-base-uncased', action='insert')
-        self.aug_subs = naw.ContextualWordEmbsAug(model_path='bert-base-uncased', action='substitute')
+        self.aug_insert = naw.ContextualWordEmbsAug(model_path='bert-base-uncased', action='insert', device='cuda')
+        self.aug_subs = naw.ContextualWordEmbsAug(model_path='bert-base-uncased', action='substitute', device='cuda')
 
     def augment(self, text):
-        text = random_aug(self.aug_insert, text, 0.5)
-        text = random_aug(self.aug_subs, text, 0.5)
+        return self.aug_insert.augment(text)
+        text = random_aug(self.aug_insert.augment, text, 0.5)
+        text = random_aug(self.aug_subs.augment, text, 0.5)
         return text
 
     def __getitem__(self, idx):
         text = self.texts[idx]
-        if self.is_train:
-            text = self.augment(text)
+        #if self.is_train:
+        #    text = self.augment(text)
         #label = 0 if self.labels[idx] < 2 else 1
         label = self.labels[idx] - 1
         encoding = self.tokenizer.encode_plus(

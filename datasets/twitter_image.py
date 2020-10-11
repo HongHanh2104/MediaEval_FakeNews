@@ -14,12 +14,10 @@ class TwitterImageDataset(Dataset):
     def __init__(self,
                  csv_data,
                  img_path,
-                 classes,
                  img_size=224,
                  is_train=True):
         super().__init__()
 
-        self.classes = classes
         self.img_size = img_size
         self.image_path = Path(img_path)  
         self.data = pd.read_csv(Path(csv_data))
