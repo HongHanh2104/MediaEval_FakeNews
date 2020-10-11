@@ -14,12 +14,10 @@ class TwitterImageDataset(Dataset):
     def __init__(self,
                  csv_data,
                  img_path,
-                 classes,
                  img_size=224,
                  is_train=True):
         super().__init__()
 
-        self.classes = classes
         self.img_size = img_size
         self.image_path = Path(img_path)  
         self.data = pd.read_csv(Path(csv_data))
@@ -59,7 +57,7 @@ def main():
     parser.add_argument('--image')
     args = parser.parse_args()
 
-    dataset = TwitterImageDataset(args.csv, args.image, classes=3)
+    dataset = TwitterImageDataset(args.csv, args.image)
     dataset.__getitem__(1)
 
 
