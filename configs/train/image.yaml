@@ -4,6 +4,7 @@ seed: 21498
 model:
     name: ImageClassifier
     args:
+        version: resnet50
         nclasses: 3
         # ... more args
 optimizer:
