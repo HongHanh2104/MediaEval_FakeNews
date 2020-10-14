@@ -8,6 +8,7 @@ import transformers
 import argparse
 import os 
 from pathlib import Path
+from PIL import Image
 
 import nlpaug.augmenter.word as naw
 
@@ -19,8 +20,11 @@ def random_aug(aug, text, p):
 class Twitter(data.Dataset):
     def __init__(self,
                  data_root_dir=None,
+                 img_path=None,
+                 img_size=224,
                  pretrain='bert-base-uncased',
-                 max_len=128, 
+                 max_len=128,
+                 include_text=True, 
                  is_train=True):
         super().__init__()
 
@@ -34,8 +38,27 @@ class Twitter(data.Dataset):
         self.texts = self.data['Text'].values
         self.labels = self.data['Label'].values
         self.tokenizer = self.get_tokenizer(pretrain, max_len)
-
+        self.include_text = include_text
         self.is_train = is_train
+
+        if self.include_text:
+            self.image_path = Path(img_path)
+            self.image_size = img_size
+
+        if self.is_train:
+            self.transforms = tvtf.Compose([
+                tvtf.Resize((224, 224)),
+                tvtf.ToTensor(),
+                tvtf.Normalize(mean=[0.485, 0.456, 0.406],
+                               std=[0.229, 0.224, 0.225])
+            ])
+        else:
+            self.transforms = tvtf.Compose([
+                tvtf.Resize((224, 224)),
+                tvtf.ToTensor(),
+                tvtf.Normalize(mean=[0.485, 0.456, 0.406],
+                               std=[0.229, 0.224, 0.225])
+            ])
         #self.tokenizer.add_tokens(['5g', 'coronavirus', 'covid'])
         #self.init_augmenter()
 
@@ -50,6 +73,12 @@ class Twitter(data.Dataset):
         return text
 
     def __getitem__(self, idx):
+        if self.include_text:
+            image = self.ids[idx]
+            path = self.image_path / (str(image) + '.png')
+            image = Image.open(path).convert('RGB')
+            image = self.transforms(image)
+
         text = self.texts[idx]
         #if self.is_train:
         #    text = self.augment(text)
@@ -66,14 +95,20 @@ class Twitter(data.Dataset):
             truncation=True
         )
         #print(self.tokenizer.tokenize(text), label)
+        if self.include_text:
+            return ({
+                'image': image,
+                'text': text,
+                'input_ids': encoding['input_ids'].flatten(),
+                'attention_mask': encoding['attention_mask'].flatten(),
+                }, torch.tensor(label).long())
 
-        return {
-            'text': text,
-            'input_ids': encoding['input_ids'].flatten(),
-            'attention_mask': encoding['attention_mask'].flatten(),
-            'labels': torch.tensor(label).long()
-        }
-
+        else:
+            return ({
+                'text': text,
+                'input_ids': encoding['input_ids'].flatten(),
+                'attention_mask': encoding['attention_mask'].flatten(),
+                }, torch.tensor(label).long())
 
     def __len__(self):
         return len(self.ids)

@@ -26,6 +26,9 @@ args = parser.parse_args()
 # Seed the random processes
 random.seed(args.seed)
 
+if not os.path.isdir(args.out):
+    os.system(f'mkdir {args.out}')
+
 # Load CSV
 df = pd.read_csv(args.text)
 data = df.values
@@ -35,14 +38,14 @@ for id_str, lb, *metadata in data:
     d.setdefault(lb, [])
     path = os.path.join(args.img, str(id_str) + '.png')
     if os.path.isfile(path):
-        d[lb].append(id_str)
+        d[lb].append((id_str, *metadata))
 
 
-out = [['ID', 'Label']]
+out = [['ID', 'Label', 'Text']]
 out.extend([
-    [id_str, lb]
+    [id_str, lb, *metadata]
     for lb, value_list in d.items()
-    for id_str in value_list
+    for id_str, *metadata in value_list
 ])
 
 csv.writer(open(f'{args.out}/{os.path.basename(args.text)}', 'w')).writerows(out)
