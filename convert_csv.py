@@ -17,6 +17,7 @@ parser.add_argument('--root', help='Path to the Dataset')
 parser.add_argument('--img', help='Path to Image folder')
 parser.add_argument('--out_text', help='Path to text data folder', default='./data/text')
 parser.add_argument('--out_img', help='Path to img data folder', default='./data/image')
+parser.add_argument('--txt_img', default=False)
 args = parser.parse_args()
 
 root_path = args.root
@@ -29,6 +30,9 @@ if not os.path.isdir(out_text):
     os.system(f'mkdir {out_text}')
 if not os.path.isdir(out_img):
     os.system(f'mkdir {out_img}') 
+if args.txt_img:
+    if not os.path.isdir('text-image'):
+        os.system('mkdir text-image')
 
 def create_text_data(root, out_text):
     text_map = {
@@ -81,5 +85,34 @@ def create_img_data(root, img_path, out_img):
     csv.writer(open(f'{out_img}/data.csv', 'w')).writerows(data_out)
     print('COMPLETE CONVERTING TO IMAGE CSV FILE.')
 
-create_text_data(root_path, out_text)
-create_img_data(root_path, img_path, out_img)
+def create_txt_img(root, img_path, out_path='text-image'):
+    data_map = {}
+    for i in range(len(LABELS)):
+        data_map.setdefault(LABELS[i], [])
+        path = os.path.join(root_path, LABELS[i] + '.json')
+        with open(path, 'r') as f:
+            data = json.load(f)
+        for j in range(len(data)):
+            id_str = data[j]['id_str']
+            label = i + 1
+            text = data[j]['full_text']
+            path = os.path.join(img_path, id_str + ".png")
+            
+            if os.path.isfile(path):
+                data_map[LABELS[i]].append((id_str, label, text, id_str + '.png'))
+            else:
+                data_map[LABELS[i]].append((id_str, label, text, ''))
+    data_out = [['ID', 'Label', 'Text', 'Image Path']]
+    for k, v in data_map.items():
+        data_out.extend([
+            [id_str, label, *metadata] for id_str, label, *metadata in v
+        ])
+
+    csv.writer(open(f'./data/{out_path}/data.csv', 'w')).writerows(data_out)
+    print('COMPLETE CONVERTING TO TEXT-IMAGE CSV FILE.')
+
+if args.txt_img:
+    create_txt_img(root_path, img_path)
+else:
+    create_text_data(root_path, out_text)
+    #create_img_data(root_path, img_path, out_img)

@@ -24,7 +24,7 @@ class Twitter(data.Dataset):
                  img_size=224,
                  pretrain='bert-base-uncased',
                  max_len=128,
-                 include_text=True, 
+                 include_image=True, 
                  is_train=True):
         super().__init__()
 
@@ -38,10 +38,10 @@ class Twitter(data.Dataset):
         self.texts = self.data['Text'].values
         self.labels = self.data['Label'].values
         self.tokenizer = self.get_tokenizer(pretrain, max_len)
-        self.include_text = include_text
+        self.include_image = include_image
         self.is_train = is_train
 
-        if self.include_text:
+        if self.include_image:
             self.image_path = Path(img_path)
             self.image_size = img_size
 
@@ -73,7 +73,7 @@ class Twitter(data.Dataset):
         return text
 
     def __getitem__(self, idx):
-        if self.include_text:
+        if self.include_image:
             image = self.ids[idx]
             path = self.image_path / (str(image) + '.png')
             image = Image.open(path).convert('RGB')
@@ -95,7 +95,7 @@ class Twitter(data.Dataset):
             truncation=True
         )
         #print(self.tokenizer.tokenize(text), label)
-        if self.include_text:
+        if self.include_image:
             return ({
                 'image': image,
                 'text': text,
